@@ -1,7 +1,7 @@
 import express from 'express';
 import userRoutes from './routes/user.js';
+import { reqAuth } from './middleware/auth.middleware.js';
 import cookieParser from 'cookie-parser';
-
 const app = express(); 
 const port = 8080;  
 app.use(express.json())
@@ -18,6 +18,6 @@ app.listen(port, () => {
     console.log(`You are now listening live on port ${port}`)
 })
 
-app.get('/', (req, res) => {
+app.get('/', reqAuth, (req, res) => {
     return res.json(store);
 })
