@@ -1,8 +1,11 @@
 import express from 'express';
 import userRoutes from './routes/user.js';
+import cookieParser from 'cookie-parser';
+
 const app = express(); 
 const port = 8080;  
 app.use(express.json())
+app.use(cookieParser())
 app.use('/user', userRoutes);
 
 const store = [{
@@ -16,5 +19,5 @@ app.listen(port, () => {
 })
 
 app.get('/', (req, res) => {
-    res.json(store);
+    return res.json(store);
 })
