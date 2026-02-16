@@ -12,7 +12,8 @@ const db = mysql.createPool({
 })
 
 
-//Create a user DB FUNCTION 
+//USER DB FUNCTIONS
+
 export async function createUser(username, password) {
     
     const [result] = await db.query(`
@@ -31,7 +32,7 @@ export async function getOneUser(id) {
         FROM users 
         WHERE id = ?
         `, [id])
-    return rows;
+    return rows[0];
     
 }
 
@@ -43,3 +44,76 @@ export async function getUsername(username) {
         `, [username])
         return rows[0];
 }
+
+export async function updateUser (id, username, password_hash) {
+
+    const safeUsername = username && username.trim() ? username : null;
+
+    const [result] = await db.query(`
+        UPDATE users 
+        SET 
+            username = COALESCE(?, username),
+            password_hash = COALESCE(?, password_hash)
+        WHERE id = ?
+        `, [safeUsername, password_hash ?? null, id])
+        return result;
+}
+
+export async function deleteUser(id) {
+    const [result] = await db.query(`
+        DELETE FROM users 
+        WHERE id = ?
+        `, [id])
+        return result;
+}
+
+
+
+//BOARD DB FUNCTIONS 
+
+export async function createBoard (user_id, title, description) {
+    const [result] = await db.query(`
+        INSERT INTO boards (id, user_id, title, description, status)
+        VALUES (id, ?, ?, ?, "active")
+        `, [user_id, title, description])
+        const id = result.id;
+        getBoardById(id);
+    }
+
+export async function getBoardById (id) {
+    const [rows] = await db.query(`
+        SELECT * 
+        FROM boards 
+        WHERE id = ?
+        `, [id])
+        return rows;
+}
+
+export async function getBoardsFromUser (user_id) {
+    const [rows] = await db.query(`
+        SELECT * 
+        FROM boards 
+        WHERE user_id = ?
+        `, [user_id])
+        return rows;
+}
+
+export async function updateBoard (id, user_id, title, description, status) {
+    const [result] = await db.query(`
+        UPDATE boards
+        SET 
+            title = COALESCE(?, title),
+            description = COALESCE(?, description), 
+            status = COALESCE(?, status)
+        WHERE id = ? AND user_id = ?
+        `, [title ?? null, description ?? null, status ?? null, id, user_id])
+        return result;
+}
+
+export async function deleteBoard (id, user_id) {
+    const [result] = await db.query(` 
+        DELETE FROM boards 
+        WHERE id = ? AND user_id = ?
+        `, [id, user_id])
+        return result;
+    }

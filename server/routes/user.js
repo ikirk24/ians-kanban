@@ -1,8 +1,9 @@
 import express from 'express' ;
 import bcrypt from 'bcrypt';
-import {createUser, getOneUser, getUsername } from '../db.js';
+import {createUser, getOneUser, getUsername, updateUser, deleteUser } from '../db.js';
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv';
+import { reqAuth } from '../middleware/auth.middleware.js';
 dotenv.config()
 
 const router = express.Router();
@@ -18,7 +19,7 @@ async function hashPassword (password) {
 
 //Sign Up Route
 
-router.post('/signup', async (req, res)=> {
+router.post('/signup', async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -75,8 +76,55 @@ router.post('/', async (req, res) => {
     })
 })
 
+// Update route 
+
+router.put('/', reqAuth, async(req, res) => {
+    const {username, password} = req.body || {};
+
+    try {
+        const trimUsername = username?.trim() || null;
+        const trimPassword = password?.trim() || null;
+        const updatedPassword = trimPassword ? await hashPassword(trimPassword) : null;
+        const result = await updateUser(req.user.id, trimUsername, updatedPassword);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({message: "User not found"})
+        }
+
+        return res.status(200).json({message: `User ${req.user.id} has been updated `, result})
+    } catch (err) {
+        console.error(err)
+        return res.status(500).json({message: err.message});
+    }
+})
+
+//Delete route
+
+router.delete('/', reqAuth, async (req, res) => {
+
+    try {
+        const result = await deleteUser(req.user.id);
+         if(result.affectedRows === 0) {
+            return res.status(404).json({message: "User not found"})
+        }
+        res.clearCookie("accessToken");
+        return res.status(200).json({message:`User ${req.user.id} has been deleted `, result})
+
+       
+    } catch(err){
+        console.error(err);
+        return res.status(500).json({message: err.message})
+    }
+})
+
+// Logout route 
+router.post('/logout', reqAuth, async (req, res) => {
+    res.clearCookie("accessToken")
+    return res.status(200).json({message: "User has been logged out"})
+})
+
 router.get('/', (req,res) => {
-    res.send({message: "Request granted"})
+    return res.send({message: "Request granted"})
 })
 
 export default router;

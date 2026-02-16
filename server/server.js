@@ -1,12 +1,15 @@
 import express from 'express';
 import userRoutes from './routes/user.js';
+import boardRoutes from './routes/board.js';
 import { reqAuth } from './middleware/auth.middleware.js';
 import cookieParser from 'cookie-parser';
 const app = express(); 
 const port = 8080;  
+
 app.use(express.json())
 app.use(cookieParser())
 app.use('/user', userRoutes);
+app.use('/board', boardRoutes);
 
 const store = [{
     "apples": "yum", 
