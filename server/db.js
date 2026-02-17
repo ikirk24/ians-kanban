@@ -77,17 +77,8 @@ export async function createBoard (user_id, title, description) {
         VALUES (id, ?, ?, ?, "active")
         `, [user_id, title, description])
         const id = result.id;
-        getBoardById(id);
+        getBoardById(user_id, id);
     }
-
-export async function getBoardById (id) {
-    const [rows] = await db.query(`
-        SELECT * 
-        FROM boards 
-        WHERE id = ?
-        `, [id])
-        return rows;
-}
 
 export async function getBoardsFromUser (user_id) {
     const [rows] = await db.query(`
@@ -96,6 +87,15 @@ export async function getBoardsFromUser (user_id) {
         WHERE user_id = ?
         `, [user_id])
         return rows;
+}
+
+export async function getBoardById(user_id, id) {
+    const [rows] = await db.query(`
+        SELECT * 
+        FROM boards 
+        WHERE user_id = ? AND id = ?
+        `, [user_id, id])
+        return rows[0]
 }
 
 export async function updateBoard (id, user_id, title, description, status) {
