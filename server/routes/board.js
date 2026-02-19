@@ -1,5 +1,5 @@
 import express from 'express';
-import { createBoard, getBoardsFromUser, getBoardById, updateBoard, deleteBoard } from '../db.js';
+import { createBoard, getBoardsFromUser, getBoardById, updateBoard, deleteBoard, autoColumnCreate} from '../db.js';
 import { reqAuth } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
@@ -17,6 +17,7 @@ router.post('/', reqAuth, async (req, res) => {
 
     try {
         const result = await createBoard(req.user.id, title, description)
+        const createColumns = await autoColumnCreate(req.user.id, result.id)
         return res.status(201).json({message: "Board created successfully ", result})
     } catch (err) {
         return res.status(500).json({message: err.message})
@@ -39,7 +40,7 @@ router.get('/:id', reqAuth, async (req,res) => {
 
     try {
         const result = await getBoardById(req.user.id, req.params.id);
-        if (!result || result.length === 0) {
+        if (!result) {
             return res.status(404).json({message: "Board not found"})
         }
         return res.status(200).json({message: `Successfully showing board number ${req.params.id} for user ${req.user.id} `, result})
