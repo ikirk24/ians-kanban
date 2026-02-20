@@ -47,6 +47,8 @@ router.get('/:cardId', reqAuth, async (req, res) => {
     }
 })
 
+//Get all cards from a column route
+
 router.get('/', reqAuth, async (req, res) => {
     const board_id = req.params.boardId
     const column_id = req.params.columnId
@@ -64,6 +66,8 @@ router.get('/', reqAuth, async (req, res) => {
         return res.status(500).json({message: err.message})
     }
 })
+
+//Update card route
 
 router.put('/:cardId', reqAuth, async (req,res) => {
     const board_id = req.params.boardId
@@ -90,6 +94,8 @@ router.put('/:cardId', reqAuth, async (req,res) => {
     }
 
 })
+
+//Delete card route 
 
 router.delete('/:cardId', reqAuth, async (req,res) => {
     const board_id = req.params.boardId
