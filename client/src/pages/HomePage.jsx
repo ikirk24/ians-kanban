@@ -60,10 +60,9 @@ export default function HomePage({
     }
     
     return (
-        <div>
-            <h1 class='text-blue-400' >{isSignUp ? "Sign up" : "Log in"}</h1>
-            <br />
+        <div class="homeContainer">
             <form onSubmit={handleSubmit}>
+            <h1 class='text-blue-400 text-3xl pb-5' >{isSignUp ? "Sign up" : "Log in"}</h1>
                 
                 <input 
                 type="text"
@@ -84,13 +83,14 @@ export default function HomePage({
                 <br />
                 
                 <button 
+                className="w-2xs mb-4"
                 type="submit"
                 disabled={loading}>
                     {loading ? "Please wait..." : isSignUp ? "Create Account" : "Log in"}
                 </button>
 
-                {isSignUp ? <p> Already have an account? <Link to="/">Sign in</Link></p> : 
-                <p> Don't have an account yet? <Link to="/signup">Sign Up</Link></p>}
+                {isSignUp ? <p> Already have an account? <Link to="/" className="text-blue-500" onClick={() => setError(null)}>Sign in</Link></p> : 
+                <p> Don't have an account yet? <Link to="/signup" className="text-blue-500" onClick={() => setError(null)}>Sign Up</Link></p>}
 
                 {error && <p>{error}</p>}
             </form>

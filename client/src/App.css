@@ -2,6 +2,47 @@
 
 #root {
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
+
+/* Login and Sign up Pages */
+
+.homeContainer { 
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.homeContainer form {
+  border: 1px solid black;
+  padding: 10px;
+  border-radius: 15px;
+  width: 50%;
+}
+
+.homeContainer input {
+  width: 75%;
+  margin-bottom: 12px;
+  border: 1px rgba(119, 119, 119, 0.505) solid;
+  border-radius: 6px;
+  padding-left: 8px;
+}
+
+.homeContainer button:hover {
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.796);
+  color: rgb(190, 203, 248);
+}
+
+
+button {
+  padding: 0 8px;
+  border: 1px solid black;
+  border-radius: 4px;
+  background-color: black;
+  color: whitesmoke;
+}
+
+/* User Page */
