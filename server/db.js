@@ -129,7 +129,7 @@ export async function createColumn (user_id, board_id, title) {
         SELECT b.id, ?, COALESCE(MAX(c.position), 0) + 1
         FROM boards b 
         LEFT JOIN columns c ON c.board_id = b.id
-        WHERE board_id = ? AND b.user_id = ?
+        WHERE b.id = ? AND b.user_id = ?
         GROUP BY b.id
         `, [title, board_id, user_id])
         return result;

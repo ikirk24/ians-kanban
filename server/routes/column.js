@@ -33,9 +33,6 @@ router.get('/', reqAuth, async (req, res) => {
 
     try {
         const columns = await getColumnsFromBoard(req.user.id, boardId);
-        if(columns.length === 0 ) {
-            return res.status(404).json({message: "Board not found"})
-        }
 
         return res.status(200).json({message: `Reading all columns from board number ${boardId} `, columns})
     } catch(err) {
