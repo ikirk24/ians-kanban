@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import CreateCard from "../components/CreateCard.jsx";
 
 export default function BoardPage () {
    
@@ -10,8 +11,8 @@ export default function BoardPage () {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
     const [refreshKey, setRefreshKey] = useState(0);
+    
     useEffect(() => {
 
         const fetchColumn = async () => {
@@ -93,41 +94,7 @@ async function createColumn (e) {
         }
     }
    
-async function createCard (e, columnId) {
-        e.preventDefault();
 
-        setError("");
-        setLoading(true)
-        const body = {title, description}
-
-        if (!title) throw new Error ("Title and description is required")
-        try {
-            const res = await fetch(`http://localhost:8080/board/${boardId}/column/${columnId}/card`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify(body)
-            })
-
-            let cardData = null;
-
-            try {
-                cardData = await res.json()
-            } catch {
-                cardData = null;
-            }
-
-            if (!res.ok) throw new Error(cardData?.message || "Request failed")
-        } catch (err) {
-            setError(err.message || "Something went wrong")
-            
-        } finally {
-            setLoading(false);
-            setTitle("");
-            setDescription("")
-            setRefreshKey(prevKey => prevKey + 1)
-        }
-    }
 
 
 
@@ -144,29 +111,15 @@ async function createCard (e, columnId) {
                     <p>{card.title}</p></div>
             ))}
 
-            <form action="submit" onSubmit={(e) => createCard(e, col.id)}>
-             
-            <input 
-                type="text"
-                placeholder="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-            />
-            
-            <input type="text"
-                placeholder="Description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)} 
-            />
+        <CreateCard boardId={boardId} columnId={col.id} onCreated={(e) => setRefreshKey(prevKey => prevKey + 1)
+}/>
 
-            <button type="submit"
-            disabled ={loading}> {loading ? "Loading..." : "Create Card"}</button>
-
-        </form>
+           
             </div>
 
         ))}
 
+        
         <form action="submit" onSubmit={createColumn}>
              
             <input 
