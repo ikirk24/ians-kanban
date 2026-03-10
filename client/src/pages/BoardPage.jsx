@@ -97,6 +97,37 @@ async function createColumn (e) {
         }
     }
    
+async function deleteColumn(e, columnId) {
+        e.preventDefault();
+
+        setLoading(true)
+
+        try {
+
+
+            const res = await fetch(`http://localhost:8080/board/${boardId}/column/${columnId}`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+            })
+
+            let data = null;
+
+            try {
+                data = await res.json()
+            } catch {
+                data = null;
+            }
+
+            if (!res.ok) throw new Error(data?.message || "Request failed")
+        } catch (err) {
+            setError(err.message || "Something went wrong")
+            
+        } finally {
+            setLoading(false);
+            setRefreshKey(prevKey => prevKey + 1)
+        }
+    }
 
 
 
@@ -108,6 +139,7 @@ async function createColumn (e) {
         { columnData && columnData.map((col) => (
             <div key={col.id}> 
                 <h1 className="text-4xl text-blue-700">{col.title}</h1>
+                <button onClick={(e) => deleteColumn(e, col.id)}> x </button>
 
             {(cardData[col.id] ?? []).map((card) => (
                 <div key={card.id}>
