@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import CreateCard from "../components/CreateCard.jsx";
+import DeleteCard from "../components/DeleteCard.jsx";
 
 export default function BoardPage () {
    
@@ -64,10 +65,12 @@ async function createColumn (e) {
 
         setError("");
         setLoading(true)
-        const body = {title}
+        const body = {title: title.trim()}
 
-        if (!title) throw new Error ("Title is required")
         try {
+
+            if (!title.trim()) throw new Error ("Title is required")
+
             const res = await fetch(`http://localhost:8080/board/${boardId}/column`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -108,11 +111,14 @@ async function createColumn (e) {
 
             {(cardData[col.id] ?? []).map((card) => (
                 <div key={card.id}>
-                    <p>{card.title}</p></div>
+                    <p>{card.title}</p>
+                    <DeleteCard boardId={boardId} columnId={col.id} cardId={card.id} onDelete={(e) => setRefreshKey(prevKey => prevKey + 1)}/>
+                </div>
+
             ))}
 
         <CreateCard boardId={boardId} columnId={col.id} onCreated={(e) => setRefreshKey(prevKey => prevKey + 1)
-}/>
+}/>     
 
            
             </div>
