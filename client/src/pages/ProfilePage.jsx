@@ -125,6 +125,38 @@ export default function ProfilePage() {
         }
     }
 
+    async function deleteBoard (e, boardId) {
+        e.preventDefault();
+
+        setLoading(true)
+
+        const ok = window.confirm("Are you sure you want to delete this board? This cannot be undone.")
+        if(!ok) return;
+
+        try {
+            const res = await fetch(`http://localhost:8080/board/${boardId}`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+            })
+
+            let data = null
+
+            try {
+                data = await res.json();
+            } catch {
+                data = null 
+            }
+
+            if (!res.ok) setError(data?.message || "Request failed")
+        } catch (err) {
+            setError(err);
+            console.error(err)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
     <div>
         <h1 className="text-lime-600 text-6xl">You have successfully logged in</h1>
@@ -139,6 +171,7 @@ export default function ProfilePage() {
         {data && data.result.map((board) => (
             <div key={board.id}>
                 <Link to={`/board/${board.id}`}>{board.title}</Link>
+                <button onClick={(e) => deleteBoard(e, board.id)}>x</button>
             </div>
         ))}
 

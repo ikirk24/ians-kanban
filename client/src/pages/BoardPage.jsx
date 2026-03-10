@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import CreateCard from "../components/CreateCard.jsx";
 import DeleteCard from "../components/DeleteCard.jsx";
 
 export default function BoardPage () {
    
+    const navigate = useNavigate(); 
+
     let {boardId} = useParams();
     
     const [columnData, setColumnData] = useState([]);
@@ -171,6 +173,10 @@ async function deleteColumn(e, columnId) {
             disabled ={loading}> {loading ? "Loading..." : "Create Column"}</button>
 
         </form>
+
+        <hr />
+
+        <button onClick={(e) => navigate('/profile')}>Back to Profile</button>
 
     
         </>
