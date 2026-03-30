@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import CreateCard from "../components/CreateCard.jsx";
 import DeleteCard from "../components/DeleteCard.jsx";
+import NavBar from "../components/NavBar.jsx";
 
 export default function BoardPage () {
    
@@ -136,6 +137,7 @@ async function deleteColumn(e, columnId) {
 
     return (
         <> 
+        <NavBar/>
         {error && <h1>{error}</h1>}
         {loading && <h1>Loading...</h1>}
         { columnData && columnData.map((col) => (
@@ -173,12 +175,6 @@ async function deleteColumn(e, columnId) {
             disabled ={loading}> {loading ? "Loading..." : "Create Column"}</button>
 
         </form>
-
-        <hr />
-
-        <button onClick={(e) => navigate('/profile')}>Back to Profile</button>
-
-    
         </>
     )
 }

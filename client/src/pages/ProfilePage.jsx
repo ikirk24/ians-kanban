@@ -1,12 +1,14 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react";
-
+import PopUpForm from "../components/PopUpForm.jsx";
+import NavBar from "../components/NavBar.jsx";
 export default function ProfilePage() {
     
     const navigate = useNavigate(); 
     
     const [data, setData] = useState("");
+    const [username, setUsername] = useState("");
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [loading, setLoading] = useState(false);
@@ -14,7 +16,6 @@ export default function ProfilePage() {
 
     useEffect(() => {
         fetch('http://localhost:8080/board', {
-            method: 'GET',
             credentials: 'include'
         }).then((res) => {
             if (!res.ok) throw new Error("not authorized")
@@ -24,7 +25,15 @@ export default function ProfilePage() {
         ).catch(error => setError(error.message))
     }, [createBoard])
     
-    
+    useEffect(() => {
+        fetch(`http://localhost:8080/user`, {
+            credentials: 'include'
+        }).then((res) => {
+            if (!res.ok) throw new Error("not authorized")
+            return res.json()
+        }).then(data => setUsername(data.result.username)
+        ).catch(error => setError(error.message))
+    }, [])
    
    
     async function selectBoard(e, boardId) {
@@ -97,8 +106,9 @@ export default function ProfilePage() {
 
         const body = {title, description}
 
-        if (!title) throw new Error ("Title is required")
         try {
+        if (!title) throw new Error ("Title is required")
+
             const res = await fetch('http://localhost:8080/board', {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -159,23 +169,33 @@ export default function ProfilePage() {
 
     return (
     <div>
-        <h1 className="text-lime-600 text-6xl">You have successfully logged in</h1>
         
         {error && <h1>{error}</h1>}
 
         {!error && 
         <>
-        <h1 className="text-5xl mt-20 mb-5">Kanban Boards</h1>
-        </>}
+        <NavBar/>
+        <div className="flex flex-col items-center" >
+            <h1 className="text-5xl mt-20 mb-5 border-2 w-xl p-10 rounded-2xl">
+            {username}'s Kanban Boards
+            </h1>
+         <div className="w-2xl mt-10 grid gap-4 grid-cols-3">
+            {data && data.result.map((board) => (
+                    <Link to={`/board/${board.id}`} key={board.id}
+                    className=" bg-amber-600 rounded-2xl border-3 mb-10 h-24 w-full   text-blue-200 text-2xl  justify-center">
+                        <p className=" rounded-t-xl  bg-gray-600">{board.title}</p>
+                    </Link>
+            ))}
+        </div>   
+        <PopUpForm 
+        title={title}
+        description={description}
+        onTitleChange={(e) => setTitle(e.target.value)}
+        onDescriptionChange={(e) => setDescription(e.target.value)}
+        onSubmit={createBoard}
+        />
 
-        {data && data.result.map((board) => (
-            <div key={board.id}>
-                <Link to={`/board/${board.id}`}>{board.title}</Link>
-                <button onClick={(e) => deleteBoard(e, board.id)}>x</button>
-            </div>
-        ))}
-
-        <form action="submit" onSubmit={createBoard}>
+        {/* <form action="submit" onSubmit={createBoard}>
              
             <input 
                 type="text"
@@ -191,11 +211,16 @@ export default function ProfilePage() {
             />
 
             <button type="submit"
-            disabled ={loading}> {loading ? "Loading..." : "Create Board"}</button>
+            disabled ={loading}> {loading ? "Loading..." : "Create Board"}</button> */}
 
-        </form>
+        {/* </form> */}
         <button onClick={logout} className="mt-10">Log Out</button>
+        </div> 
+        </>
+        }
+
     </div>
+
 
     )
 }

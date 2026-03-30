@@ -76,6 +76,24 @@ router.post('/', async (req, res) => {
     })
 })
 
+//Get User Route 
+
+router.get('/', reqAuth, async(req,res) => {
+    
+    try {
+        const result = await getOneUser(req.user.id)
+        if (result.affectedRows === 0 ) {
+            return res.status(404).json({message: "User not found"})
+        }
+        return res.status(200).json({message: `User ${result.username} has been found `, result})
+        
+        
+    }catch (err) {
+            console.error(err)
+            return res.status(500).json({message: err.message})
+    }
+})
+
 // Update route 
 
 router.put('/', reqAuth, async(req, res) => {
