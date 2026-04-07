@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect} from 'react'
+import clickOutside from '../hooks/clickOutside.jsx';
 
 const CreateCard = ({boardId, columnId, onCreated}) => {
   
@@ -6,13 +7,16 @@ const CreateCard = ({boardId, columnId, onCreated}) => {
     const [error, setError] = useState("");
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    
+    const [visible, setVisible] = useState(false);
+    const boxRef = useRef(null)
+    const inputRef = useRef(null);
+
     async function create (e) {
         e.preventDefault();
 
         setError("");
         setLoading(true)
-        const body = {title: title.trim(), description: title.trim()}
+        const body = {title: title.trim(), description: description.trim()}
 
         try {
             if (!title.trim()) throw new Error ("Title is required")
@@ -38,38 +42,58 @@ const CreateCard = ({boardId, columnId, onCreated}) => {
             setDescription("")
 
             onCreated?.();
+            
         } catch (err) {
             setError(err.message || "Something went wrong")
             
         } finally {
             setLoading(false);
-           
+            setVisible(false)
         }
     }
+
+    useEffect(() => {
+        if (visible) {
+            inputRef.current?.focus();
+            setError("")
+        }
+     }, [visible])
+    
+    clickOutside(boxRef, () => {
+        setVisible(false);
+    });
+   
   
     return (
     <> 
-    {error && <p>{error}</p>}
-
-    <form onSubmit={create}>
+    {error && <p className='text-white'>{error}</p>}
+    
+    { !visible && 
+        <button className='text-gray-400 w-13/14 rounded-md mt-2 mb-2 p-1  text-left hover:bg-gray-700 hover:opacity-60 hover:text-white cursor-pointer'
+        onClick={() => {setVisible(true)}}>
+        + Add Card
+        </button>
+    
+    }
+    
+    {visible && 
+    <form onSubmit={create} className='m-4 flex flex-col' ref={boxRef}>
              
             <input 
                 type="text"
-                placeholder="Title"
+                placeholder="Enter a card title..."
+                ref={inputRef}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                className='placeholder:text-gray-300 placeholder:text-left border-2 border-white pb-6 rounded-md pl-2 overflow-clip text-white w-13/14 '
             />
             
-            <input type="text"
-                placeholder="Description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)} 
-            />
-
             <button type="submit" 
-            disabled ={loading}> {loading ? "Loading..." : "Create Card"}</button>
+            className=' bg-blue-600 rounded-md p-1 mt-2 w-1/3 text-white hover:cursor-pointer hover:bg-blue-800'
+            disabled ={loading}> {loading ? "Loading..." : "Add card"}</button>
 
         </form>
+    }
         </>
   )
 }

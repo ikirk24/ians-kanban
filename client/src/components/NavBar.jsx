@@ -1,9 +1,62 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useState, useRef } from 'react';
+import clickOutside from '../hooks/clickOutside.jsx';
 
 const NavBar = () => {
-  
+    const navigate = useNavigate();
+    const boxRef = useRef();
+    const [visible, setVisible] = useState(false); 
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+     const togglePopup = () => {
+        setVisible(!visible)
+    }
+
+    clickOutside(boxRef, () => {
+        setVisible(false)
+    })
+    
+
+
+     async function logout(e) {
+        e.preventDefault();
+
+        setLoading(true);
+        setError('');
+
+        const ok = window.confirm("Do you want to logout?")
+        if (!ok) return;
+        try {
+            const res = await fetch('http://localhost:8080/user/logout', {
+                method: 'POST',
+                credentials: 'include'
+            })
+
+            let data = null;
+          try {
+            data = await res.json();
+        } catch {
+            data = null
+        }
+
+        if (!res.ok) {
+            throw new Error (data?.message || "Request failed")
+        }
+
+        navigate('/')
+        } catch(err) {
+            console.error(err)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
+        <>
+        {error && <h1 className='text-9xl text-red-700'>{error}</h1>}
+
+        {!error && 
     <div className='border-b-black border-b-2 p-2 w-full flex justify-between'>
         
         <p className='text-2xl'>Kirk's Kanban</p>
@@ -22,14 +75,26 @@ const NavBar = () => {
                 </svg>
             </Link>
         
-            <p>
+            <p onClick={() => {setVisible(!visible) }} className='hover:cursor-pointer' >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                 </svg>
             </p>
         </div>
 
-    </div>
+        {visible &&
+        
+        <div className='w-1/6 bg-gray-700 absolute right-0 mt-10 h-1/5 rounded-lg' ref={boxRef}>
+            <div className='p-4 text-gray-400 text-left text-2xl'>
+            <p>Profile</p>
+            <p>Update Profile</p>
+            <button className='hover:cursor-pointer'
+            onClick={logout} >Logout</button>
+            </div>
+        </div> }
+
+    </div> }
+    </>
   )
 }
 

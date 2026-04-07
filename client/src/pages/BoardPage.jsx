@@ -133,21 +133,23 @@ async function deleteColumn(e, columnId) {
     }
 
 
-
-
+    const sortedColumns = [...columnData].sort((a,b) => a.position - b.position)
+    // const sortedCards = [...cardData].sort((a,b) => a.position - b.position);
     return (
         <> 
         <NavBar/>
         {error && <h1>{error}</h1>}
         {loading && <h1>Loading...</h1>}
-        { columnData && columnData.map((col) => (
-            <div key={col.id}> 
-                <h1 className="text-4xl text-blue-700">{col.title}</h1>
-                <button onClick={(e) => deleteColumn(e, col.id)}> x </button>
+       <div className="w-full overflow-x-auto overflow-y-hidden ml-10">
+            <div className="flex flex-row items-start pt-16 gap-16 min-w-max">
+        { columnData && sortedColumns.map((col) => (
+            <div key={col.id} className="border-2 rounded-2xl bg-black opacity-75 w-1/6"> 
+                <h1 className="text-xl text-left pl-4  font-bold text-gray-100">{col.title}</h1>
+                {/* <button onClick={(e) => deleteColumn(e, col.id)}> x </button> */}
 
             {(cardData[col.id] ?? []).map((card) => (
-                <div key={card.id}>
-                    <p>{card.title}</p>
+                <div key={card.id} className="flex justify-between text-gray-300 pl-2 mt-2 ml-2 mr-2 bg-gray-900 rounded-md p-1 text-lg text-left ">
+                    <p className="">{card.title}</p>
                     <DeleteCard boardId={boardId} columnId={col.id} cardId={card.id} onDelete={(e) => setRefreshKey(prevKey => prevKey + 1)}/>
                 </div>
 
@@ -156,13 +158,10 @@ async function deleteColumn(e, columnId) {
         <CreateCard boardId={boardId} columnId={col.id} onCreated={(e) => setRefreshKey(prevKey => prevKey + 1)
 }/>     
 
-           
-            </div>
+           </div>
 
         ))}
-
-        
-        <form action="submit" onSubmit={createColumn}>
+        <form action="submit" onSubmit={createColumn} className="border-2 rounded-2xl bg-gray-500 opacity-75 w-1/6">
              
             <input 
                 type="text"
@@ -175,6 +174,11 @@ async function deleteColumn(e, columnId) {
             disabled ={loading}> {loading ? "Loading..." : "Create Column"}</button>
 
         </form>
+        </div>
+            </div>
+
+        
+        
         </>
     )
 }
