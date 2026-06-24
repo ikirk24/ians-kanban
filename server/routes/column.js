@@ -16,8 +16,7 @@ router.post('/', reqAuth, async (req, res) => {
         
         if (result.affectedRows === 0 ) {
             return res.status(404).json({message: "Board not found"})
-        }
-        
+        }     
         return res.status(200).json(({message: "Column created successfully", result}))
     } catch(err) {
         console.error(err);
@@ -51,7 +50,7 @@ router.put('/:columnId',reqAuth, async (req,res) => {
     
     try {
         const trimTitle = title?.trim() || null;
-        const newPosition = Number(position) || null
+        const newPosition = position === undefined ? null : Number(position)
         const result = await updateColumn(boardId, columnId, trimTitle, newPosition)
         return res.status(200).json({message: `Board number ${boardId} successfully updated `, result})
     } catch(err) {
