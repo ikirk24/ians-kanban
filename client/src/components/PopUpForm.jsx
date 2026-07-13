@@ -8,7 +8,6 @@ const PopUpForm = ({title, description, onTitleChange, onDescriptionChange, onSu
     const togglePopup = () => {
         setVisible(!visible)
     }
-    
     return (
 
     <> 

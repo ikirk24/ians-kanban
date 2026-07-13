@@ -26,7 +26,7 @@ export default function ProfilePage() {
     }, [createBoard])
     
     useEffect(() => {
-        fetch('http://localhost:8080/user', {
+        fetch(`http://localhost:8080/user`, {
             credentials: 'include'
         }).then((res) => {
             if (!res.ok) throw new Error("not authorized")
@@ -67,7 +67,36 @@ export default function ProfilePage() {
     }
 
 
-   
+    async function logout(e) {
+        e.preventDefault();
+
+        setLoading(true);
+        setError('');
+
+        try {
+            const res = await fetch('http://localhost:8080/user/logout', {
+                method: 'POST',
+                credentials: 'include'
+            })
+
+            let data = null;
+          try {
+            data = await res.json();
+        } catch {
+            data = null
+        }
+
+        if (!res.ok) {
+            throw new Error (data?.message || "Request failed")
+        }
+
+        navigate('/')
+        } catch(err) {
+            console.error(err)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     async function createBoard (e) {
         e.preventDefault();
@@ -78,10 +107,7 @@ export default function ProfilePage() {
         const body = {title, description}
 
         try {
-        if (!title) {
-            alert ("Title is required")
-            return;
-        }
+        if (!title) throw new Error ("Title is required")
 
             const res = await fetch('http://localhost:8080/board', {
                 method: "POST",
@@ -169,8 +195,27 @@ export default function ProfilePage() {
         onSubmit={createBoard}
         />
 
-        
-    </div> 
+        {/* <form action="submit" onSubmit={createBoard}>
+             
+            <input 
+                type="text"
+                placeholder="Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+            />
+            
+            <input type="text"
+                placeholder="Description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)} 
+            />
+
+            <button type="submit"
+            disabled ={loading}> {loading ? "Loading..." : "Create Board"}</button> */}
+
+        {/* </form> */}
+        <button onClick={logout} className="mt-10">Log Out</button>
+        </div> 
         </>
         }
 
