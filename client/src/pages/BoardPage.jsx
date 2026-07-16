@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import CreateCard from "../components/CreateCard.jsx";
 import DeleteCard from "../components/DeleteCard.jsx";
 import NavBar from "../components/NavBar.jsx";
+import Card from "../components/Card.jsx";
+import Column from "../components/Column.jsx";
+import {DragDropProvider} from '@dnd-kit/react';
+import {move} from '@dnd-kit/helpers';
 
 export default function BoardPage () {
    
@@ -16,7 +20,8 @@ export default function BoardPage () {
     const [loading, setLoading] = useState(false);
     const [title, setTitle] = useState("");
     const [refreshKey, setRefreshKey] = useState(0);
-    
+    const previousCards = useRef(cardData);
+
     useEffect(() => {
 
         const fetchColumn = async () => {
@@ -140,25 +145,53 @@ async function deleteColumn(e, columnId) {
         <NavBar/>
         {error && <h1>{error}</h1>}
         {loading && <h1>Loading...</h1>}
+       
+       <DragDropProvider 
+            onDragStart={() => {
+                previousCards.current = cardData;
+            
+            }}
+
+            onDragOver={(event) => {
+                const {source, target} = event.operation;
+
+                if (source?.type === 'column') return; 
+
+                setCardData((cards) => move(cards, event));
+            }}
+
+            onDragEnd={(event) => {
+                const {source, target} = event.operation; 
+
+                if(event.canceled) {
+                     if (source.type === 'item') {
+                        setCardData(previousCards.current)
+                     } 
+                     return;
+                    } 
+                
+                if (source.type === 'column') {
+                   setColumnData((columns) => move(columns, event));
+                } 
+                
+            }}
+            >
        <div className="w-full overflow-x-auto overflow-y-hidden pb-50">
             <div className="flex flex-row items-start pt-16 gap-16 px-8 min-w-max">
         { columnData && sortedColumns.map((col) => (
-            <div key={col.id} className="border-2 rounded-2xl bg-black opacity-75 w-80 shrink-0"> 
-                <h1 className="text-xl text-left pl-4  font-bold text-gray-100">{col.title}</h1>
+            <Column id={col.id} key={col.id} index={col.position} title={col.title}>
                 {/* <button onClick={(e) => deleteColumn(e, col.id)}> x </button> */}
 
-            {(cardData[col.id] ?? []).map((card) => (
-                <div key={card.id} className="flex justify-between text-gray-300 pl-2 mt-2 ml-2 mr-2 bg-gray-900 rounded-md p-1 text-lg text-left ">
-                    <p className="">{card.title}</p>
-                    <DeleteCard boardId={boardId} columnId={col.id} cardId={card.id} onDelete={(e) => setRefreshKey(prevKey => prevKey + 1)}/>
-                </div>
+            {(cardData[col.id] ?? []).map((card, index) => (
+                <Card id={card.id} index={index} key={card.id} column={col.id} onDelete={(e) => setRefreshKey(prevKey => prevKey + 1)} boardId={boardId} colId={col.id} title={card.title}/>
 
             ))}
 
         <CreateCard boardId={boardId} columnId={col.id} onCreated={(e) => setRefreshKey(prevKey => prevKey + 1)
-}/>     
+        }/>     
 
-           </div>
+           </Column>
+        
 
         ))}
         <form action="submit" onSubmit={createColumn} className="border-2 rounded-2xl bg-gray-500 opacity-75 w-1/6">
@@ -176,6 +209,8 @@ async function deleteColumn(e, columnId) {
         </form>
         </div>
             </div>
+        </DragDropProvider>
+
 
         
         
