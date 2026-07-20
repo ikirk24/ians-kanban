@@ -21,6 +21,7 @@ export default function BoardPage () {
     const [title, setTitle] = useState("");
     const [refreshKey, setRefreshKey] = useState(0);
     const previousCards = useRef(cardData);
+    const previousColumns = useRef(columnData);
 
     useEffect(() => {
 
@@ -104,6 +105,36 @@ async function createColumn (e) {
             setRefreshKey(prevKey => prevKey + 1)
         }
     }
+
+async function updateColumn (columnId, position) {
+
+    setLoading(true)
+    const body = {title: null, position: position || null};
+
+    try {
+        const res = await fetch(`http://localhost:8080/board/${boardId}/column/${columnId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(body)
+        })
+
+        let columnData = null; 
+
+        try {
+            columnData = await res.json(); 
+        } catch {
+            columnData = null;
+        }
+
+        if (!res.ok) throw new Error(columnData?.message || "Request failed")
+    } catch (err) {
+        setError(err.message || "Something went wrong")
+    } finally {
+        setLoading(false);
+        setRefreshKey(prevKey => prevKey + 1)
+    }
+}
    
 async function deleteColumn(e, columnId) {
         e.preventDefault();
@@ -147,9 +178,11 @@ async function deleteColumn(e, columnId) {
         {loading && <h1>Loading...</h1>}
        
        <DragDropProvider 
+            
             onDragStart={() => {
                 previousCards.current = cardData;
-            
+                previousColumns.current = columnData;
+                console.log(previousColumns.current)
             }}
 
             onDragOver={(event) => {
@@ -160,7 +193,7 @@ async function deleteColumn(e, columnId) {
                 setCardData((cards) => move(cards, event));
             }}
 
-            onDragEnd={(event) => {
+            onDragEnd={async (event) => {
                 const {source, target} = event.operation; 
 
                 if(event.canceled) {
@@ -171,8 +204,19 @@ async function deleteColumn(e, columnId) {
                     } 
                 
                 if (source.type === 'column') {
-                   setColumnData((columns) => move(columns, event));
+                   const updatedColumns = move(columnData, event).map((column, index) => ({
+                    ...column, 
+                    position: index + 1
+                   }));
+
+                   setColumnData(updatedColumns)
+
+                    await Promise.all(
+                        updatedColumns.map((column) => 
+                            updateColumn(column.id, column.position))
+                   )
                 } 
+               
                 
             }}
             >
