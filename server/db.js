@@ -179,7 +179,6 @@ try {
         `, [board_id, id])
 
 
-    //See if column is moving up or moving down and shift the other columns accordingly 
     if (!column.length) {
         await conn.rollback()
         return { affectedRows: 0 }
@@ -335,7 +334,7 @@ export async function getCardByColumn (user_id, board_id, column_id) {
         return rows;
 }
 
-export async function updateCard (user_id, board_id, column_id, id, title, description, newPosition) {
+export async function updateCard (user_id, board_id, oldColumnId, newColumnId, id, title, description, newPosition) {
 
     const conn = await db.getConnection();
     
@@ -344,11 +343,12 @@ export async function updateCard (user_id, board_id, column_id, id, title, descr
         await conn.beginTransaction();
 
         const [card] = await conn.query(`
-            SELECT cards.title, cards.description, cards.position 
+            SELECT cards.title, cards.description, cards.position, cards.column_id 
             FROM cards 
             JOIN boards b ON b.id = cards.board_id
             WHERE b.user_id = ? AND cards.board_id = ? AND cards.column_id = ? AND cards.id = ?
-             `, [user_id, board_id, column_id, id])
+            FOR UPDATE
+             `, [user_id, board_id, oldColumnId, id])
 
         if (!card.length) {
             await conn.rollback() 
@@ -356,52 +356,75 @@ export async function updateCard (user_id, board_id, column_id, id, title, descr
         };
 
         const oldPosition = card[0].position 
+        const changingColumns = oldColumnId !== newColumnId; 
 
         if (newPosition !== null && newPosition !== oldPosition) {
 
             await conn.query(`
                 UPDATE cards
                 SET position = 0
-                WHERE board_id = ? AND column_id = ? AND id = ? 
-                `, [board_id, column_id, id])
+                WHERE board_id = ? 
+                AND column_id = ? 
+                AND id = ? 
+                `, [board_id, oldColumnId, id])
 
-            if (newPosition < oldPosition) {
-                await conn.query(`
-                    UPDATE cards 
-                    SET position = position + 1
-                    WHERE column_id = ?
-                    AND position >= ?
-                    AND position < ?
-                    ORDER BY position DESC 
-                    `, [ column_id, newPosition, oldPosition])
-            } else {
+            if (changingColumns) {
+                
                 await conn.query(`
                     UPDATE cards 
                     SET position = position - 1
-                    WHERE column_id = ? 
+                    WHERE board_id = ? 
+                    AND column_id = ? 
+                    AND position > ? 
+                    ORDER BY position ASC 
+                     `, [board_id, newColumnId, oldPosition]);
+                
+                await conn.query(`
+                    UPDATE cards 
+                    SET position = position + 1
+                    WHERE board_id = ? 
+                    AND column_id = ? 
+                    AND position >= ? 
+                    ORDER by position DESC
+                    `, [board_id, newColumnId, newPosition]);
+
+            } else if (newPosition < oldPosition) {
+                
+                await conn.query(`
+                    UPDATE cards 
+                    SET position = position + 1
+                    WHERE board_id = ?
+                    AND column_id = ?
+                    AND position >= ?
+                    AND position < ?
+                    ORDER BY position DESC 
+                    `, [ board_id, oldColumnId, newPosition, oldPosition])
+            } else if (newPosition > oldPosition) {
+                await conn.query(`
+                    UPDATE cards 
+                    SET position = position - 1
+                    WHERE board_id = ? 
+                    AND column_id = ? 
                     AND position <= ?
                     AND position > ?
                     ORDER BY position ASC 
-                    `, [board_id, newPosition, oldPosition])
+                    `, [board_id, oldColumnId, newPosition, oldPosition])
             }
         }
 
-        await conn.query(` 
-            UPDATE cards
-            SET position = ? 
-            WHERE column_id = ? AND id = ?
-            `, [newPosition, column_id, id])
+        
 
         const [result] = await conn.query(` 
-            UPDATE cards 
-            SET 
+            UPDATE cards
+            SET column_id = ?,
+            position = ?, 
             title = COALESCE(?, title),
             description = COALESCE(?, description)
-            WHERE column_id = ? AND id = ?
-            `, [title ?? null, description ?? null, column_id, id])
+            WHERE board_id = ? AND id = ?
+            `, [newColumnId, newPosition, title ?? null, description ?? null, board_id, id])
             
             await conn.commit() 
-            return result
+            return result;
 
         } catch (err) {
             await conn.rollback() 

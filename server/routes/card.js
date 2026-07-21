@@ -71,17 +71,16 @@ router.get('/', reqAuth, async (req, res) => {
 
 router.put('/:cardId', reqAuth, async (req,res) => {
     const board_id = req.params.boardId
-    const column_id = req.params.columnId
     const card_id = req.params.cardId
 
-    const {title, description, position} = req.body || {} 
+    const {oldColumnId, newColumnId, title, description, position} = req.body || {} 
 
     const cleanTitle = title?.trim() || null;
     const cleanDescription = description?.trim() || null;
-    const cleanPosition = Number(position) || null 
+    const cleanPosition = position !==null && position !== undefined ? Number(position) : null 
 
     try {
-        const result = updateCard(req.user.id, board_id, column_id, card_id, cleanTitle, cleanDescription, cleanPosition)
+        const result = await updateCard(req.user.id, board_id, Number(oldColumnId), Number(newColumnId), card_id, cleanTitle, cleanDescription, cleanPosition)
 
         if (result.affectedRows === 0) {
             return res.status(404).json({message: "Card not found"})
@@ -93,7 +92,7 @@ router.put('/:cardId', reqAuth, async (req,res) => {
         return res.status(500).json({message: err.message})
     }
 
-})
+});
 
 //Delete card route 
 

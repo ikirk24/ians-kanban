@@ -22,6 +22,7 @@ export default function BoardPage () {
     const [refreshKey, setRefreshKey] = useState(0);
     const previousCards = useRef(cardData);
     const previousColumns = useRef(columnData);
+    const originalColumnId = useRef(null);
 
     useEffect(() => {
 
@@ -106,7 +107,7 @@ async function createColumn (e) {
         }
     }
 
-async function updateColumn (columnId, position) {
+async function moveColumn (columnId, position) {
 
     setLoading(true)
     const body = {title: null, position: position || null};
@@ -142,8 +143,6 @@ async function deleteColumn(e, columnId) {
         setLoading(true)
 
         try {
-
-
             const res = await fetch(`http://localhost:8080/board/${boardId}/column/${columnId}`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
@@ -168,6 +167,42 @@ async function deleteColumn(e, columnId) {
         }
     }
 
+async function moveCard (oldColumnId, newColumnId, cardId, position) {
+    
+    setLoading(true);
+
+    const body = {
+        oldColumnId,
+        newColumnId, 
+        title: null, 
+        description: null, 
+        position
+    }
+
+    try {
+        const res = await fetch(`http://localhost:8080/board/${boardId}/column/${oldColumnId}/card/${cardId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(body)
+        })
+
+        let data = null;
+
+        try {
+            data = await res.json();
+        } catch {
+            data = null;
+        }
+
+        if (!res.ok) throw new Error(data?.message || "Request failed")
+    } catch (err) {
+        setError(err.message || "Something went wrong")
+    } finally {
+        setLoading(false);
+    }
+}
+
 
     const sortedColumns = [...columnData].sort((a,b) => a.position - b.position)
     // const sortedCards = [...cardData].sort((a,b) => a.position - b.position);
@@ -179,10 +214,15 @@ async function deleteColumn(e, columnId) {
        
        <DragDropProvider 
             
-            onDragStart={() => {
+            onDragStart={(event) => {
                 previousCards.current = cardData;
                 previousColumns.current = columnData;
-                console.log(previousColumns.current)
+
+                const { source } = event.operation;
+
+                if (source.type === "item" ) { 
+                    originalColumnId.current = Number(source.group)
+                }
             }}
 
             onDragOver={(event) => {
@@ -213,13 +253,26 @@ async function deleteColumn(e, columnId) {
 
                     await Promise.all(
                         updatedColumns.map((column) => 
-                            updateColumn(column.id, column.position))
+                            moveColumn(column.id, column.position))
                    )
                 } 
-               
-                
+
+                if (source.type === "item") {
+                    
+                    const updatedCards = move(cardData, event);
+
+                    setCardData(updatedCards);
+                    const cardId = source.id;
+                    const oldColumnId = Number(originalColumnId.current)
+                    const newColumnId = source.group;
+                    const newPosition = source.index + 1;
+
+                    await moveCard(oldColumnId, newColumnId, cardId, newPosition)
+
+                }
             }}
             >
+
        <div className="w-full overflow-x-auto overflow-y-hidden pb-50">
             <div className="flex flex-row items-start pt-16 gap-16 px-8 min-w-max">
         { columnData && sortedColumns.map((col) => (
