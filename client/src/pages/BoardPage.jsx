@@ -10,6 +10,8 @@ import {move} from '@dnd-kit/helpers';
 
 export default function BoardPage () {
    
+    const API_URL = import.meta.env.VITE_API_URL;
+
     const navigate = useNavigate(); 
 
     let {boardId} = useParams();
@@ -33,7 +35,7 @@ export default function BoardPage () {
             setLoading(true)
             setError("")
             
-            const colRes = await fetch(`http://localhost:8080/board/${boardId}/column`, {
+            const colRes = await fetch(`${API_URL}/${boardId}/column`, {
             credentials: 'include'
             });
             
@@ -44,7 +46,7 @@ export default function BoardPage () {
             const columnCards = await Promise.all(
                 colData.columns.map(async (col) => {
                 
-                    const res = await fetch(`http://localhost:8080/board/${boardId}/column/${col.id}/card`, {
+                    const res = await fetch(`${API_URL}/${boardId}/column/${col.id}/card`, {
                     credentials: 'include'
                     });
 
@@ -81,7 +83,7 @@ async function createColumn (e) {
 
             if (!title.trim()) throw new Error ("Title is required")
 
-            const res = await fetch(`http://localhost:8080/board/${boardId}/column`, {
+            const res = await fetch(`${API_URL}/board/${boardId}/column`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -113,7 +115,7 @@ async function moveColumn (columnId, position) {
     const body = {title: null, position: position || null};
 
     try {
-        const res = await fetch(`http://localhost:8080/board/${boardId}/column/${columnId}`, {
+        const res = await fetch(`${API_URL}/board/${boardId}/column/${columnId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -143,7 +145,7 @@ async function deleteColumn(e, columnId) {
         setLoading(true)
 
         try {
-            const res = await fetch(`http://localhost:8080/board/${boardId}/column/${columnId}`, {
+            const res = await fetch(`${API_URL}/board/${boardId}/column/${columnId}`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -180,7 +182,7 @@ async function moveCard (oldColumnId, newColumnId, cardId, position) {
     }
 
     try {
-        const res = await fetch(`http://localhost:8080/board/${boardId}/column/${oldColumnId}/card/${cardId}`, {
+        const res = await fetch(`${API_URL}/board/${boardId}/column/${oldColumnId}/card/${cardId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             credentials: "include",

@@ -14,9 +14,10 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
   
+    const API_URL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
-        fetch('http://localhost:8080/board', {
+        fetch('${API_URL}/board', {
             credentials: 'include'
         }).then((res) => {
             if (!res.ok) throw new Error("not authorized")
@@ -27,7 +28,7 @@ export default function ProfilePage() {
     }, [createBoard])
     
     useEffect(() => {
-        fetch(`http://localhost:8080/user`, {
+        fetch(`${API_URL}/user`, {
             credentials: 'include'
         }).then((res) => {
             if (!res.ok) throw new Error("not authorized")
@@ -44,7 +45,7 @@ export default function ProfilePage() {
         setError('');
 
         try {
-            const res = await fetch(`http://localhost:8080/board/${boardId}`, {
+            const res = await fetch(`${API_URL}/board/${boardId}`, {
                 credentials: 'include'
             })
 
@@ -75,7 +76,7 @@ export default function ProfilePage() {
         setError('');
 
         try {
-            const res = await fetch('http://localhost:8080/user/logout', {
+            const res = await fetch('${API_URL}/user/logout', {
                 method: 'POST',
                 credentials: 'include'
             })
@@ -110,7 +111,7 @@ export default function ProfilePage() {
         try {
         if (!title) throw new Error ("Title is required")
 
-            const res = await fetch('http://localhost:8080/board', {
+            const res = await fetch('${API_URL}/board', {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -145,7 +146,7 @@ export default function ProfilePage() {
         if(!ok) return;
 
         try {
-            const res = await fetch(`http://localhost:8080/board/${boardId}`, {
+            const res = await fetch(`${API_URL}/board/${boardId}`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",

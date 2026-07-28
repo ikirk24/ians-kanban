@@ -4,7 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 export default function HomePage({
     mode = "login",  
     onSuccess,
-    baseUrl = "http://localhost:8080"
+    API_URL = import.meta.env.VITE_API_URL
+
     })
      
     {
@@ -25,7 +26,7 @@ export default function HomePage({
 
         try {
             const endpoint = isSignUp ? "/user/signup" : "/user"
-            const url = `${baseUrl}${endpoint}`
+            const url = `${API_URL}${endpoint}`
 
             const body = {username, password}
 
