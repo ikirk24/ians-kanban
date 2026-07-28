@@ -35,7 +35,7 @@ export default function BoardPage () {
             setLoading(true)
             setError("")
             
-            const colRes = await fetch(`${API_URL}/${boardId}/column`, {
+            const colRes = await fetch(`${API_URL}/board/${boardId}/column`, {
             credentials: 'include'
             });
             
@@ -46,7 +46,7 @@ export default function BoardPage () {
             const columnCards = await Promise.all(
                 colData.columns.map(async (col) => {
                 
-                    const res = await fetch(`${API_URL}/${boardId}/column/${col.id}/card`, {
+                    const res = await fetch(`${API_URL}/board/${boardId}/column/${col.id}/card`, {
                     credentials: 'include'
                     });
 
