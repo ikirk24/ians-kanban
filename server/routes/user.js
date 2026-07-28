@@ -64,10 +64,10 @@ router.post('/', async (req, res) => {
 
     res.cookie("accessToken", accessToken, {
         httpOnly: true, 
-        sameSite: "lax",
-        secure: false,
-        path:"/",
-        maxAge: 1000 * 60 * 60 * 2
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 24 * 60 * 60 * 1000,
+        path: "/"
     })
 
     return res.status(200).json({

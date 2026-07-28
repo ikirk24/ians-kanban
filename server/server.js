@@ -17,6 +17,7 @@ const allowedOrigins = [
     process.env.CLIENT_URL
 ].filter(Boolean);
 
+console.log("NODE_ENV:", process.env.NODE_ENV);
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
