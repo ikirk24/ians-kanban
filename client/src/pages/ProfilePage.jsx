@@ -17,7 +17,7 @@ export default function ProfilePage() {
     const API_URL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
-        fetch('${API_URL}/board', {
+        fetch(`${API_URL}/board`, {
             credentials: 'include'
         }).then((res) => {
             if (!res.ok) throw new Error("not authorized")
@@ -76,7 +76,7 @@ export default function ProfilePage() {
         setError('');
 
         try {
-            const res = await fetch('${API_URL}/user/logout', {
+            const res = await fetch(`${API_URL}/user/logout`, {
                 method: 'POST',
                 credentials: 'include'
             })
@@ -111,7 +111,7 @@ export default function ProfilePage() {
         try {
         if (!title) throw new Error ("Title is required")
 
-            const res = await fetch('${API_URL}/board', {
+            const res = await fetch(`${API_URL}/board`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
