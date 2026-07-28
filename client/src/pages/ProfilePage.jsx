@@ -172,7 +172,7 @@ export default function ProfilePage() {
     return (
     <div>
         
-        {error && <h1>{error}</h1>}
+        {error && <h1>{error} <Link to='/profile'> Go Back </Link> </h1>}
 
         {!error && 
         <>
