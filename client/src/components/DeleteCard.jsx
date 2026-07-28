@@ -4,11 +4,12 @@ const DeleteCard = ({boardId, columnId, cardId, onDelete}) => {
     
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const API_URL = import.meta.env.VITE_API_URL;
     
     async function deleteC(e) {
         e.preventDefault();
         setLoading(true);
+        const API_URL = import.meta.env.VITE_API_URL;
+
 
         try {
             const res = await fetch(`${API_URL}/${boardId}/column/${columnId}/card/${cardId}`, {

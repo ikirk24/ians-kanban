@@ -11,7 +11,10 @@ const CreateCard = ({boardId, columnId, onCreated}) => {
     const boxRef = useRef(null)
     const inputRef = useRef(null);
 
+    
     async function create (e) {
+        const API_URL = import.meta.env.VITE_API_URL;
+
         e.preventDefault();
 
         setError("");
@@ -21,7 +24,7 @@ const CreateCard = ({boardId, columnId, onCreated}) => {
         try {
             if (!title.trim()) throw new Error ("Title is required")
 
-            const res = await fetch(`http://localhost:8080/board/${boardId}/column/${columnId}/card`, {
+            const res = await fetch(`${API_URL}/board/${boardId}/column/${columnId}/card`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
