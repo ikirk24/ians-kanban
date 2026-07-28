@@ -60,7 +60,7 @@ export default function BoardPage () {
             } catch (err) {
                 console.error(err)
                 setError(err.message)
-                setColumns([])
+                setColumnData([])
                 setCardData({})
             }finally {
                 setLoading(false)
