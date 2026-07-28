@@ -251,10 +251,9 @@ async function moveCard (oldColumnId, newColumnId, cardId, position) {
 
                    setColumnData(updatedColumns)
 
-                    await Promise.all(
-                        updatedColumns.map((column) => 
-                            moveColumn(column.id, column.position))
-                   )
+                    for (const column of updatedColumns) {
+                           await moveColumn(column.id, column.position)
+                    }
                 } 
 
                 if (source.type === "item") {

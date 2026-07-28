@@ -226,7 +226,7 @@ try {
         WHERE board_id = ? AND id = ?
         `, [newPosition, board_id, id])
     }
-    
+
      const [result] = await conn.query(`
         UPDATE columns 
         SET title = COALESCE(?, title)
@@ -360,9 +360,9 @@ export async function updateCard (user_id, board_id, oldColumnId, newColumnId, i
         };
 
         const oldPosition = card[0].position 
-        const changingColumns = oldColumnId !== newColumnId; 
+        const changingColumns = Number(oldColumnId) !== Number(newColumnId); 
 
-        if (newPosition !== null && newPosition !== oldPosition) {
+        if (newPosition !== null && (changingColumns || newPosition !== oldPosition)) {
 
             await conn.query(`
                 UPDATE cards
@@ -381,7 +381,7 @@ export async function updateCard (user_id, board_id, oldColumnId, newColumnId, i
                     AND column_id = ? 
                     AND position > ? 
                     ORDER BY position ASC 
-                     `, [board_id, newColumnId, oldPosition]);
+                     `, [board_id, oldColumnId, oldPosition]);
                 
                 await conn.query(`
                     UPDATE cards 
