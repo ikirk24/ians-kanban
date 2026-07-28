@@ -4,8 +4,7 @@ import { useState } from 'react';
 const PopUpForm = ({title, description, onTitleChange, onDescriptionChange, onSubmit}) => {
     
     const [visible, setVisible] = useState(false);
-
-    const togglePopup = () => {
+     const togglePopup = () => {
         setVisible(!visible)
     }
     return (
@@ -13,35 +12,47 @@ const PopUpForm = ({title, description, onTitleChange, onDescriptionChange, onSu
     <> 
 
         {visible && 
-        <div className='fixed h-screen top-0 w-7/10 m-auto z-1000 bg-gray-500 backdrop-blur-2xl opacity-90'>
+        <div className='fixed text-white inset-0 flex h-3/10 w-3/10 rounded-2xl items-center justify-center m-auto  bg-black backdrop-blur-3xl opacity-90'>
             <form 
-            className='flex-col flex h-full w-full'
+            className='flex-col flex gap-4'
             onSubmit={onSubmit}>
+
+                <h2 className='text-white text-2xl font-semibold'>Make a Board</h2>
+               
                 <input type="text"
                 value={title} 
                 placeholder='Title'
                 onChange={onTitleChange}
+                className='text-white rounded-md border border-gray-500 p-1'
                 />
                 
                 <input 
-                className='w-1/2'
+                className='w-1/2 text-white rounded-md border border-gray-500 p-1'
                 type="text"
                 value={description}
                 placeholder='Description'
                 onChange={onDescriptionChange}
                 />
+            <div className='flex justify-end gap-6'>
                 <button 
-                className='w-1/8'
-                type='submit' onSubmit={togglePopup}>Submit</button>
+                type='button'
+                className=' text-white px-4 py-2 hover:cursor-pointer'
+                onClick={togglePopup}>Cancel
+                </button>
+
                 <button 
-                className='w-1/32'
-                onClick={togglePopup}>x</button>
+                className=' rounded-md px-4 py-2 hover:cursor-pointer'
+                type='submit'>Submit
+                </button>
+                
+               
+                </div>
             </form>
         </div>
         }
 
         {!visible && 
-        <button onClick={togglePopup}>Create New Board</button>}
+        <button onClick={togglePopup} className='text-white border-b-black hover:cursor-pointer hover:text-gray-300'>Create New Board</button>}
     </>
   )
 }

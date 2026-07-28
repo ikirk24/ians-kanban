@@ -273,7 +273,7 @@ async function moveCard (oldColumnId, newColumnId, cardId, position) {
             }}
             >
 
-       <div className="w-full overflow-x-auto overflow-y-hidden pb-50">
+       <div className="w-full flex-1 overflow-x-auto overflow-y-hidden h-[calc(100vh-64px)]">
             <div className="flex flex-row items-start pt-16 gap-16 px-8 min-w-max">
         { columnData && sortedColumns.map((col) => (
             <Column id={col.id} key={col.id} index={col.position} title={col.title}>

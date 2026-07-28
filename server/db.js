@@ -5,10 +5,12 @@ dotenv.config();
 
 const db = mysql.createPool({
     host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
+    port: Number(process.env.DB_PORT),
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
+    waitForConnections: true, 
+    connectionLimit: 10
 })
 
 
@@ -217,11 +219,13 @@ try {
 
     //Run update
 
-    await conn.query(`
+    if (newPosition !== null) {
+        await conn.query(`
         UPDATE columns 
         SET position = ?
         WHERE board_id = ? AND id = ?
         `, [newPosition, board_id, id])
+    }
     
      const [result] = await conn.query(`
         UPDATE columns 

@@ -13,6 +13,7 @@ export default function ProfilePage() {
     const [description, setDescription] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+  
 
     useEffect(() => {
         fetch('http://localhost:8080/board', {
@@ -176,7 +177,7 @@ export default function ProfilePage() {
         <>
         <NavBar/>
         <div className="flex flex-col items-center" >
-            <h1 className="text-5xl mt-20 mb-5 border-2 w-xl p-10 rounded-2xl">
+            <h1 className="text-5xl mt-20 mb-5 border-2 w-xl p-10 rounded-2xl text-white">
             {username}'s Kanban Boards
             </h1>
          <div className="w-2xl mt-10 grid gap-4 grid-cols-3">
@@ -214,7 +215,7 @@ export default function ProfilePage() {
             disabled ={loading}> {loading ? "Loading..." : "Create Board"}</button> */}
 
         {/* </form> */}
-        <button onClick={logout} className="mt-10">Log Out</button>
+        <button onClick={logout} className="mt-10 text-white hover:cursor-pointer hover:text-gray-300">Log Out</button>
         </div> 
         </>
         }

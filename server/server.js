@@ -5,9 +5,12 @@ import columnRoutes from './routes/column.js';
 import cardRoutes from './routes/card.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import dotenv from 'dotenv';
+
+dotenv.config(); 
 
 const app = express(); 
-const port = 8080;  
+const port = process.env.PORT || 8080; 
 
 app.use(express.json())
 app.use(cookieParser())

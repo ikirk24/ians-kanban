@@ -16,8 +16,8 @@ router.post('/', reqAuth, async (req, res) => {
     }
 
     try {
-        const result = await createBoard(req.user.id, title, description)
-        const createColumns = await autoColumnCreate(req.user.id, result.id)
+        const result = await createBoard(req.user.id, title.trim(), description.trim())
+        await autoColumnCreate(req.user.id, result.id)
         return res.status(201).json({message: "Board created successfully ", result})
     } catch (err) {
         return res.status(500).json({message: err.message})

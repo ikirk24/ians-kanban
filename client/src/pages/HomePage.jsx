@@ -17,6 +17,8 @@ export default function HomePage({
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    
+    
     async function handleSubmit (e) {
         e.preventDefault();
         setLoading(true);
@@ -60,6 +62,8 @@ export default function HomePage({
     }
     
     return (
+        <>
+        <h1 className="text-white absolute">KANBAN DEMO BY IAN KIRK</h1>
         <div class="homeContainer">
             <form onSubmit={handleSubmit}>
             <h1 class='text-blue-400 text-3xl pb-5' >{isSignUp ? "Sign up" : "Log in"}</h1>
@@ -95,5 +99,6 @@ export default function HomePage({
                 {error && <p>{error}</p>}
             </form>
         </div>
+        </>
     )
 }

@@ -6,13 +6,14 @@ const NavBar = () => {
     return (
     <div className='border-b-black border-b-2 p-2 w-full flex justify-between'>
         
-        <p className='text-2xl'>Kirk's Kanban</p>
+        <p className='text-2xl text-white'>Kirk's Kanban</p>
         
         <div>
             <input 
             type="text" 
-            className='border-2 mr-4 rounded-md pl-2 pr-2 w-md'/>
-            <button>Search</button>
+            placeholder='Not In Service'
+            className='border-2 mr-4 text-white rounded-md pl-2 pr-2 w-md'/>
+            <button className='text-white'>Search</button>
         </div>
 
         <div className='flex pr-5'>
