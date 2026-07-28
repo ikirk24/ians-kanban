@@ -12,7 +12,7 @@ const DeleteCard = ({boardId, columnId, cardId, onDelete}) => {
 
 
         try {
-            const res = await fetch(`${API_URL}/${boardId}/column/${columnId}/card/${cardId}`, {
+            const res = await fetch(`${API_URL}/board/${boardId}/column/${columnId}/card/${cardId}`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
